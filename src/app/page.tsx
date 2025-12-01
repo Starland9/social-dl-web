@@ -238,39 +238,39 @@ export default function Home() {
   const placeholder = "Collez le lien d'Instagram, YouTube, TikTok, Spotify, Facebook, Pinterest";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-slate-900 via-[#07071b] to-black p-8">
-      <div className="w-full max-w-4xl rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 p-8 shadow-xl">
-        <header className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-linear-to-br from-pink-500 to-violet-500 flex items-center justify-center text-2xl font-bold text-white hover:scale-105 hover:rotate-6 transition-transform duration-200">SD</div>
-            <div>
-              <h1 className="text-2xl font-semibold text-white">SocialDL — Téléchargeur rapide</h1>
-              <p className="text-sm text-zinc-300">Collez un lien, choisissez la qualité, cliquez sur Télécharger</p>
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-slate-900 via-[#07071b] to-black p-4 sm:p-8 overflow-x-hidden">
+      <div className="w-full max-w-4xl rounded-2xl sm:rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 p-4 sm:p-8 shadow-xl">
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-xl bg-linear-to-br from-pink-500 to-violet-500 flex items-center justify-center text-xl sm:text-2xl font-bold text-white hover:scale-105 hover:rotate-6 transition-transform duration-200">SD</div>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg sm:text-2xl font-semibold text-white truncate">SocialDL</h1>
+              <p className="text-xs sm:text-sm text-zinc-300 truncate">Téléchargeur rapide multi-plateformes</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => window.location.reload()} className="px-4 py-2 rounded-full bg-white/6 text-white hover:bg-white/12">Réinitialiser</button>
-          </div>
+          <button onClick={() => window.location.reload()} className="self-end sm:self-auto px-3 py-1.5 sm:py-2 text-sm rounded-md bg-white/6 text-white hover:bg-white/12">Réinitialiser</button>
         </header>
 
         <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="md:col-span-2">
-            <div className="flex gap-3 items-center">
-              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={placeholder} className="flex-1 py-4 px-4 rounded-lg bg-white/6 text-white outline-none placeholder:text-white/40 backdrop-blur-sm border border-white/10" />
-              <button onClick={handlePaste} className="px-4 py-3 rounded-lg bg-white/6 text-white hover:bg-white/10 hover:scale-105 transition-transform duration-150">Coller</button>
-              <button onClick={() => setInput("")} className="px-4 py-3 rounded-lg bg-white/6 text-white hover:bg-white/10 hover:scale-105 transition-transform duration-150">Effacer</button>
+            <div className="space-y-3">
+              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={placeholder} className="w-full py-3 px-3 text-sm sm:text-base rounded-lg bg-white/6 text-white outline-none placeholder:text-white/40 backdrop-blur-sm border border-white/10" />
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-3">
+                <button onClick={handlePaste} className="px-3 py-2 text-sm rounded-lg bg-white/6 text-white hover:bg-white/10 active:scale-95 transition-transform">Coller</button>
+                <button onClick={() => setInput("")} className="px-3 py-2 text-sm rounded-lg bg-white/6 text-white hover:bg-white/10 active:scale-95 transition-transform">Effacer</button>
+              </div>
             </div>
 
-            <div className="flex gap-3 items-center mt-3">
-              <div className="px-3 py-2 rounded-lg bg-white/3 text-white">Plateforme: <span className="font-semibold ml-2">{platform ? `${platformIcon(platform)} ${platform}` : "—"}</span></div>
+            <div className="flex flex-wrap gap-2 mt-3">
+              <div className="px-3 py-2 text-sm rounded-lg bg-white/3 text-white">{platformIcon(platform)} {platform ?? "—"}</div>
               {platform === "youtube" && (
                 <>
-                  <select className="px-3 py-2 rounded-lg bg-white/3 text-white" value={type} onChange={(e) => setType(e.target.value as any)}>
+                  <select className="px-3 py-2 text-sm rounded-lg bg-white/3 text-white" value={type} onChange={(e) => setType(e.target.value as any)}>
                     <option value="video">Vidéo</option>
                     <option value="audio">Audio</option>
                   </select>
                   {type === "video" && (
-                    <select className="px-3 py-2 rounded-lg bg-white/3 text-white" value={quality} onChange={(e) => setQuality(e.target.value)}>
+                    <select className="px-3 py-2 text-sm rounded-lg bg-white/3 text-white" value={quality} onChange={(e) => setQuality(e.target.value)}>
                       {qualityOptions.map((q) => (
                         <option key={q} value={q}>{q}</option>
                       ))}
@@ -280,9 +280,9 @@ export default function Home() {
               )}
             </div>
 
-            <div className="flex items-center gap-3 mt-4">
-              <button onClick={handleDownload} disabled={downloading || !input} className="px-6 py-3 rounded-full bg-linear-to-r from-pink-500 to-violet-500 text-white font-semibold disabled:opacity-50">{downloading ? "Téléchargement..." : "Télécharger"}</button>
-              <div className="text-sm text-zinc-300">{status}</div>
+            <div className="mt-4 space-y-3">
+              <button onClick={handleDownload} disabled={downloading || !input} className="w-full px-6 py-3 rounded-full bg-linear-to-r from-pink-500 to-violet-500 text-white font-semibold disabled:opacity-50 active:scale-95 transition-transform">{downloading ? "Téléchargement..." : "Télécharger"}</button>
+              {status && <div className="text-sm text-zinc-300 text-center">{status}</div>}
             </div>
             <div className="mt-3">
               <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
@@ -297,11 +297,11 @@ export default function Home() {
               {previewUrl ? (
                 previewType?.startsWith("image") || previewType === "image" ? (
                   // Image preview
-                  <img src={previewUrl as string} alt="preview" onError={() => { setPreviewUrl(null); setStatus("Aperçu non disponible"); }} className="object-contain w-full rounded-md" />
+                  <img src={previewUrl as string} alt="preview" onError={() => { setPreviewUrl(null); setStatus("Aperçu non disponible"); }} className="object-contain w-full rounded-md max-h-48" />
                 ) : previewType === "audio" ? (
-                  <audio src={previewUrl as string} controls onError={() => { setPreviewUrl(null); setStatus("Aperçu non disponible"); }} className="w-full" />
+                  <audio src={previewUrl as string} controls onError={() => { setPreviewUrl(null); setStatus("Aperçu non disponible"); }} className="w-full max-h-20" />
                 ) : (
-                  <video src={previewUrl as string} controls onError={() => { setPreviewUrl(null); setStatus("Aperçu non disponible"); }} className="w-full rounded-md" />
+                  <video src={previewUrl as string} controls onError={() => { setPreviewUrl(null); setStatus("Aperçu non disponible"); }} className="w-full rounded-md max-h-48" />
                 )
               ) : (
                 <div className="h-40 rounded-md bg-white/6 flex items-center justify-center text-sm text-zinc-400">Aucun aperçu</div>
@@ -322,7 +322,7 @@ export default function Home() {
                   <div className="text-xs text-zinc-400">Aucun téléchargement enregistré</div>
                 ) : (
                   history.map((h, idx) => (
-                    <div key={idx} className="flex items-center justify-between gap-2 mb-2">
+                    <div key={idx} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-2">
                       <div className="text-xs">
                         <div className="font-medium">{(h.platform ? platformIcon(h.platform) + " " : "")}{h.filename || h.url.split('/').pop()}</div>
                         <div className="text-zinc-400">{h.platform} • {h.type} • {(h.size / 1024).toFixed(0)} KB</div>
