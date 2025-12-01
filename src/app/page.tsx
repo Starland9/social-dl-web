@@ -340,7 +340,14 @@ export default function Home() {
           </aside>
         </section>
 
-        <footer className="mt-8 text-sm text-zinc-400 text-center">Simple, rapide, et futuriste — SocialDL</footer>
+        <footer className="mt-8 text-sm text-zinc-400 text-center">
+          <div>Simple, rapide, et futuriste — SocialDL</div>
+          <div className="mt-2 flex items-center justify-center gap-4 text-xs">
+            <a href="https://github.com/Starland9" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors">🐙 GitHub <span className="sr-only">(opens in a new tab)</span></a>
+            <a href="https://www.linkedin.com/in/landry-simo-7b326122b" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors">🔗 LinkedIn <span className="sr-only">(opens in a new tab)</span></a>
+            <a href="https://portfolio.starland9.dev" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors">🌐 Portfolio <span className="sr-only">(opens in a new tab)</span></a>
+          </div>
+        </footer>
       </div>
     </div>
   );
