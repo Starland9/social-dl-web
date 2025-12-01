@@ -31,6 +31,44 @@ API:
 - POST `/api/download` - Body: `{ url, type?, quality? }` - Detects platform and returns `{ status: 'success', url, type }` if available.
 - POST `/api/download/file` - Body: `{ mediaUrl, filename? }` - Proxies and streams a remote media file through the server to avoid CORS.
 
+Features added in UI:
+- Preview media (video/audio/image) before/after download
+- Local download history stored in `localStorage` (up to 20 items), with quick preview and re-download buttons
+- Download progress bar with streaming progress (estimation when Content-Length not provided)
+- Improved UI with micro-interactions and platform icons
+
+## Deployment (PM2)
+
+This project provides a `deploy/deploy.sh` helper script that:
+
+- Installs dependencies (requires pnpm)
+- Builds the Next.js static assets
+- Starts the process using PM2 via `deploy/ecosystem.config.js`
+
+Important notes for production deploys:
+- Ensure `pnpm` and `pm2` are present on the machine (script uses `npx --yes pm2` when `pm2` is not installed globally).
+- Export a `BACKEND_URL` environment variable if you want to use a custom upstream proxy instead of the default (`https://api.socialdl.starland9.dev`). Example:
+
+```bash
+BACKEND_URL=https://api.your-backend.example ./deploy/deploy.sh
+```
+
+- PM2 app name is `social-dl-web` and listens on port 3002 (configured in `deploy/ecosystem.config.js`).
+- The script saves the PM2 process list (via `pm2 save`) so the process is persisted across reboots.
+
+To run the deploy script locally:
+
+```bash
+./deploy/deploy.sh
+```
+
+If you prefer to manage deploy manually, you can start PM2 with the ecosystem file directly:
+
+```bash
+npx pm2 start deploy/ecosystem.config.js --env production
+```
+
+
 UI: Paste a social URL and use the interface to choose quality (for YouTube) and download the media.
 
 ## Learn More
