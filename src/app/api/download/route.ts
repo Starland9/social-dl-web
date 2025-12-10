@@ -1,29 +1,8 @@
+import { detectPlatform } from "@/utils/plateformUtils";
 import { NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.BACKEND_URL || "https://api.socialdl.starland9.dev";
-
-function detectPlatform(url: string | null) {
-  if (!url) return null;
-  try {
-    const parsedUrl = new URL(url);
-    const hostname = parsedUrl.hostname.toLowerCase();
-    const instaHosts = ["instagram.com", "www.instagram.com", "instagr.am", "www.instagr.am"];
-    if (instaHosts.includes(hostname)) return "instagram";
-    const ytHosts = ["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"];
-    if (ytHosts.includes(hostname)) return "youtube";
-    const ttHosts = ["tiktok.com", "www.tiktok.com", "vm.tiktok.com", "m.tiktok.com"];
-    if (ttHosts.includes(hostname)) return "tiktok";
-    const spotifyHosts = ["spotify.com", "open.spotify.com", "www.spotify.com"];
-    if (spotifyHosts.includes(hostname)) return "spotify";
-    const fbHosts = ["facebook.com", "www.facebook.com", "m.facebook.com", "fb.watch", "fb.com", "www.fb.com"];
-    if (fbHosts.includes(hostname)) return "facebook";
-    const pinHosts = ["pinterest.com", "www.pinterest.com", "pin.it"];
-    if (pinHosts.includes(hostname)) return "pinterest";
-    return null;
-  } catch (err) {
-    return null;
-  }
-}
+const BACKEND_URL =
+  process.env.BACKEND_URL || "https://api.socialdl.starland9.dev";
 
 async function postToBackend(path: string, body: any) {
   const url = `${BACKEND_URL}${path}`;
@@ -49,9 +28,17 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { url, type = "video", quality = "720p" } = body || {};
-    if (!url) return NextResponse.json({ status: "failed", reason: "Missing url" }, { status: 400 });
+    if (!url)
+      return NextResponse.json(
+        { status: "failed", reason: "Missing url" },
+        { status: 400 }
+      );
     const platform = detectPlatform(url);
-    if (!platform) return NextResponse.json({ status: "failed", reason: "Unsupported platform" }, { status: 400 });
+    if (!platform)
+      return NextResponse.json(
+        { status: "failed", reason: "Unsupported platform" },
+        { status: 400 }
+      );
 
     let resp: any = { status: "failed", reason: "No response" };
     switch (platform) {
@@ -76,19 +63,39 @@ export async function POST(req: Request) {
     }
 
     if (!resp || resp.status !== "success") {
-      return NextResponse.json({ status: "failed", reason: resp?.reason || "Download failed" }, { status: 500 });
+      return NextResponse.json(
+        { status: "failed", reason: resp?.reason || "Download failed" },
+        { status: 500 }
+      );
     }
 
     // Normalize response - look for common keys
-    const direct = resp?.ViDeO_LiNk_DeReCT || resp?.Video_Url || resp?.Audio_Url || resp?.AuDiO_LiNk_DeReCT || resp?.video || resp?.audio;
+    const direct =
+      resp?.ViDeO_LiNk_DeReCT ||
+      resp?.Video_Url ||
+      resp?.Audio_Url ||
+      resp?.AuDiO_LiNk_DeReCT ||
+      resp?.video ||
+      resp?.audio;
     const finalType = type || (resp?.type ? resp.type : "video");
 
     if (!direct) {
-      return NextResponse.json({ status: "failed", reason: "No direct link returned." }, { status: 500 });
+      return NextResponse.json(
+        { status: "failed", reason: "No direct link returned." },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ status: "success", url: direct, type: finalType, quality: resp?.Quality || quality });
+    return NextResponse.json({
+      status: "success",
+      url: direct,
+      type: finalType,
+      quality: resp?.Quality || quality,
+    });
   } catch (err: any) {
-    return NextResponse.json({ status: "failed", reason: err.message }, { status: 500 });
+    return NextResponse.json(
+      { status: "failed", reason: err.message },
+      { status: 500 }
+    );
   }
 }

@@ -1,55 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-
-type Platform =
-  | "instagram"
-  | "youtube"
-  | "tiktok"
-  | "spotify"
-  | "facebook"
-  | "pinterest"
-  | null;
-
-function detectPlatform(url: string | null): Platform {
-  if (!url) return null;
-  try {
-    const parsed = new URL(url);
-    const h = parsed.hostname.toLowerCase();
-    const IG = [
-      "instagram.com",
-      "www.instagram.com",
-      "instagr.am",
-      "www.instagr.am",
-    ];
-    const YT = ["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"];
-    const TT = [
-      "tiktok.com",
-      "www.tiktok.com",
-      "vm.tiktok.com",
-      "m.tiktok.com",
-    ];
-    const SP = ["spotify.com", "open.spotify.com", "www.spotify.com"];
-    const FB = [
-      "facebook.com",
-      "www.facebook.com",
-      "m.facebook.com",
-      "fb.watch",
-      "fb.com",
-      "www.fb.com",
-    ];
-    const PIN = ["pinterest.com", "www.pinterest.com", "pin.it"];
-    if (IG.includes(h)) return "instagram";
-    if (YT.includes(h)) return "youtube";
-    if (TT.includes(h)) return "tiktok";
-    if (SP.includes(h)) return "spotify";
-    if (FB.includes(h)) return "facebook";
-    if (PIN.includes(h)) return "pinterest";
-    return null;
-  } catch (err) {
-    return null;
-  }
-}
+import { Platform } from "@/lib/types/Platform";
+import { detectPlatform, platformIcon } from "@/utils/plateformUtils";
 
 export default function Home() {
   const [input, setInput] = useState("");
@@ -82,25 +35,6 @@ export default function Home() {
     const stored = localStorage.getItem("sd_history");
     if (stored) setHistory(JSON.parse(stored));
   }, []);
-
-  function platformIcon(p: Platform | string | null) {
-    switch (p) {
-      case "instagram":
-        return "📸";
-      case "youtube":
-        return "▶️";
-      case "tiktok":
-        return "🎵";
-      case "spotify":
-        return "🎧";
-      case "facebook":
-        return "📘";
-      case "pinterest":
-        return "📌";
-      default:
-        return "🔗";
-    }
-  }
 
   // Helper: convert Response to Blob with progress callback
   async function streamResponseToBlob(
@@ -142,53 +76,6 @@ export default function Home() {
     });
     return blob;
   }
-
-  const handleDownloadFromHistory = async (entry: any) => {
-    // Re-download a history entry's URL directly
-    setInput(entry.url);
-    setType(entry.type || "video");
-    setPreviewUrl(entry.url);
-    setPreviewType(entry.type || "video");
-    setStatus(null);
-    setDownloading(true);
-    setProgress(0);
-    try {
-      const r = await fetch(entry.url);
-      if (!r.ok) throw new Error(`status: ${r.status}`);
-      const blob = await streamResponseToBlob(r, (p) => setProgress(p));
-      const urlBlob = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = urlBlob;
-      a.download =
-        entry.filename || `download.${blob.type.split("/")[1] || "mp4"}`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(urlBlob);
-      setStatus("Téléchargement terminé !");
-      // Ensure history exists: add re-download event
-      try {
-        const existing = JSON.parse(localStorage.getItem("sd_history") || "[]");
-        // Update `entry` time/size if blob available
-        const entryUpdated = {
-          ...entry,
-          time: new Date().toISOString(),
-          size: blob?.size || entry.size || 0,
-        };
-        existing.unshift(entryUpdated);
-        const top = existing.slice(0, 20);
-        localStorage.setItem("sd_history", JSON.stringify(top));
-        setHistory(top);
-      } catch (err) {
-        console.warn("history save failed", err);
-      }
-    } catch (err: any) {
-      console.error(err);
-      setStatus(`Erreur: ${err?.message || "unknown"}`);
-    } finally {
-      setDownloading(false);
-    }
-  };
 
   const handlePaste = async () => {
     try {
@@ -232,13 +119,25 @@ export default function Home() {
       const rawName =
         urlParts[urlParts.length - 1].split("?")[0] || `${detected}.mp4`;
       let filename = rawName;
+
+      // Map type to extension based on backend response type
+      const getExtFromBackendType = (type: string | null) => {
+        if (!type) return "mp4";
+        if (type === "audio") return "mp3";
+        if (type === "image") return "jpg";
+        return "mp4";
+      };
+
       // Try to fetch the binary and download with streaming progress
       setProgress(0);
       let blob;
+      let contentTypeFromResponse: string | null = null;
+
       try {
         // Attempt streaming download to monitor progress
         const r2 = await fetch(mediaUrl);
         if (!r2.ok) throw new Error(`status:${r2.status}`);
+        contentTypeFromResponse = r2.headers.get("content-type");
         blob = await streamResponseToBlob(r2, (p) => setProgress(p));
       } catch (err) {
         // Try server-side streaming fallback to avoid CORS using our API
@@ -255,17 +154,36 @@ export default function Home() {
           setDownloading(false);
           return;
         }
+        contentTypeFromResponse = fileResp.headers.get("content-type");
         // Attempt streaming from server proxy
         blob = await streamResponseToBlob(fileResp, (p) => setProgress(p));
       }
-      const ext =
-        blob.type.split("/")[1] || (json.type === "audio" ? "mp3" : "mp4");
+
+      // Déduire l'extension à partir du content-type ou du backend type
+      const mimeType = contentTypeFromResponse || blob.type;
+      const getExtFromMime = (mime: string) => {
+        if (!mime || mime.includes("octet-stream")) return null;
+        if (mime.includes("mp4")) return "mp4";
+        if (mime.includes("webm")) return "webm";
+        if (mime.includes("mpeg") || mime.includes("mp3")) return "mp3";
+        if (mime.includes("ogg")) return "ogg";
+        if (mime.includes("wav")) return "wav";
+        if (mime.includes("m4a")) return "m4a";
+        if (mime.includes("jpeg") || mime.includes("jpg")) return "jpg";
+        if (mime.includes("png")) return "png";
+        if (mime.includes("gif")) return "gif";
+        if (mime.includes("webp")) return "webp";
+        return null;
+      };
+
+      let ext = getExtFromMime(mimeType) || getExtFromBackendType(json.type);
+
       // Ensure filename has the correct extension
       if (!filename.includes(".")) {
         filename = `${filename.split("?")[0] || detected}.${ext}`;
-      } else if (!filename.endsWith(ext) && filename.split(".").pop() !== ext) {
-        // replace extension if it seems incorrect
-        const base = filename.split(".").slice(0, -1).join(".");
+      } else {
+        // Always replace extension to be safe
+        const base = filename.replace(/\.[^.]+$/, "");
         filename = `${base}.${ext}`;
       }
       const a = document.createElement("a");
@@ -354,7 +272,10 @@ export default function Home() {
 
             <div className="flex flex-wrap gap-2 mt-3">
               <div className="px-3 py-2 text-sm rounded-lg bg-white/3 text-white">
-                {platformIcon(platform)} {platform ?? "—"}
+                {platformIcon(platform)}{" "}
+                {platform
+                  ? platform.charAt(0).toUpperCase() + platform.slice(1)
+                  : "—"}
               </div>
               {platform === "youtube" && (
                 <>
