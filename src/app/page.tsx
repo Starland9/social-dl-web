@@ -311,9 +311,9 @@ export default function Home() {
               <p>Plateforme: <b className="text-white">{platform ?? "—"}</b></p>
               <p>Format: <b className="text-white">{type}</b></p>
               {platform === "youtube" && <p>Quality: <b className="text-white">{quality}</b></p>}
-              <p className="mt-3 text-xs text-zinc-400">Si le téléchargement échoue (CORS), le lien s'ouvrira dans un nouvel onglet.</p>
+              {/* <p className="mt-3 text-xs text-zinc-400">Si le téléchargement échoue (CORS), le lien s'ouvrira dans un nouvel onglet.</p> */}
             </div>
-            <div className="mt-4 border-t border-white/8 pt-3">
+            {/* <div className="mt-4 border-t border-white/8 pt-3">
               <h5 className="text-sm font-semibold mb-2">Historique (local)</h5>
               <div className="mb-2 text-xs text-zinc-400">Utilisé pour relancer des téléchargements locaux sans ré-appeler le backend.</div>
               <div className="flex justify-end mb-2"><button onClick={() => { localStorage.removeItem('sd_history'); setHistory([]); }} className="py-1 px-2 rounded bg-red-500 text-white text-xs hover:opacity-80 transition-opacity">Effacer</button></div>
@@ -336,7 +336,7 @@ export default function Home() {
                   ))
                 )}
               </div>
-            </div>
+            </div> */}
           </aside>
         </section>
 
