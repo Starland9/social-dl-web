@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import SwRegister from "../components/SwRegister";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,7 +13,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadataBase = new URL("https://portfolio.starland9.dev");
+export const metadataBase = new URL("https://social-dl.starland9.dev");
 
 export const metadata: Metadata = {
   title: {
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
     title: "SocialDL — Téléchargeur Multi-Plateformes",
     description:
       "Colle un lien, choisis la qualité, télécharge : SocialDL simplifie les téléchargements depuis YouTube, Instagram, TikTok, Spotify, Facebook et Pinterest.",
-    url: "https://portfolio.starland9.dev",
+    url: "https://social-dl.starland9.dev",
     siteName: "SocialDL",
     images: [
       {
@@ -61,17 +62,13 @@ export const metadata: Metadata = {
     description:
       "Colle un lien, choisis la qualité, télécharge : SocialDL simplifie les téléchargements multi-plateformes.",
     // Optional: replace with Twitter handle if available
-    site: "@Starland9",
+    site: "@Starland237",
   },
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
-  ],
   robots: {
     index: true,
     follow: true,
@@ -94,6 +91,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <SwRegister />
       </body>
     </html>
   );

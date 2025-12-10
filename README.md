@@ -68,6 +68,26 @@ If you prefer to manage deploy manually, you can start PM2 with the ecosystem fi
 npx pm2 start deploy/ecosystem.config.js --env production
 ```
 
+## PWA (Progressive Web App)
+
+This project includes basic PWA support:
+
+- `public/manifest.json` — PWA manifest with icons (192/256/384/512)
+- `public/sw.js` — Simple service worker that caches basic assets and serves an `offline.html` fallback
+- `public/offline.html` — A minimal offline page shown when the network is unavailable
+- `src/components/SwRegister.tsx` — Client component that registers the service worker
+
+How to test locally:
+1. Run the dev server:
+```bash
+pnpm dev
+```
+2. Open the site in Chrome and go to DevTools > Application > Service Workers to inspect the service worker registration
+3. Simulate offline mode and reload to see `offline.html` fallback
+
+Note: For full PWA installation flow you should test in a production build because service worker behavior varies between `next dev` and `next start`.
+
+
 
 UI: Paste a social URL and use the interface to choose quality (for YouTube) and download the media.
 
