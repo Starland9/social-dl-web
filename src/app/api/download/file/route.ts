@@ -12,7 +12,6 @@ export async function POST(req: Request) {
     // Proxy the file from server-side to avoid CORS and to enable direct download
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 120000);
-    console.log(`Fetching media from URL: ${mediaUrl}`);
     try {
       const r = await fetch(mediaUrl, { signal: controller.signal });
       clearTimeout(timeout);
